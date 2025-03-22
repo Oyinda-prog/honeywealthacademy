@@ -17,22 +17,24 @@ interface formik{
     }
 
 const Page = () => {
+    // let studentid=''
     const route=useRouter()
-    const [userid, setuserid] = useState({})
+    const [userid, setuserid] = useState('')
     useEffect(() => {
     const settimeout=setTimeout(() => {
         localStorage.removeItem('current_time')
          route.push("/student_login")
-      return ()=>clearTimeout(settimeout)
-    }, 10000);
+        }, 500000);
+        return ()=>clearTimeout(settimeout)
       
-    })
+    },[])
 useEffect(() => {
     if(localStorage['studentid']){
-        const studentid=JSON.parse(localStorage.getItem('studentid')!)
-        setuserid(studentid)
-        console.log(userid);
-        
+    //    const studentid=
+        setuserid(JSON.parse(localStorage.getItem('studentid')!))
+        // console.log(userid);
+
+    
       }
 }, [])
 
@@ -41,28 +43,36 @@ const formik=useFormik({
     initialValues:{
         educationlevel:'',
         gender:'',
-        studentid:userid
+        
         
     },
     onSubmit:async(values)=>{
+        // alert(12)
+        const payload={
+            ...values,
+            studentid:userid
+        }
+        console.log(payload);
+        
     try {
         const response=await fetch('http://localhost/nextjsbackendproject/studentonboarding.php',{
             method:'POST',
             headers:{
                 "Content-Type":"application/json"
             },
-            body:JSON.stringify(values)
+            body:JSON.stringify(payload)
         }
     ) 
-       const data=await response.json()    
-      if(data.status){
-        localStorage.setItem('currenttime',JSON.stringify('true'))
-        localStorage.setItem('currentuser',JSON.stringify(data.user))
-        route.push("/onboarding")
-      }
-      else{
-        alert('failed')
-      }
+       const data=await response.json() 
+       console.log(data);
+          
+    //   if(data){
+    //     console.log(data);
+        
+    //   }
+    //   else{
+    //     alert('failed')
+    //   }
       
       
     } catch (err) {
