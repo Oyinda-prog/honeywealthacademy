@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { useRouter } from 'next/navigation'
 
 interface formik{
 firstname:string,
@@ -11,9 +12,11 @@ dob:string,
 password:string,
 phonenumber:string,
 refcode:string|number,
-onboarding:boolean
+onboarding:boolean,
+invitercode:string
 }
 const Page = () => {
+    const route=useRouter()
 const [msg, setmsg] = useState('')
     const alphabet=['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
     
@@ -36,11 +39,12 @@ const [msg, setmsg] = useState('')
             email:'',
             password:'',  
             refcode:totalref,
-            onboarding:false
+            onboarding:false,
+            invitercode:''
         },
         onSubmit:async(values)=>{
             
-            // console.log( totalref);
+            console.log( values);
             
         try{
             const response=await fetch('http://localhost/nextjsbackendproject/signup.php',{
@@ -51,12 +55,19 @@ const [msg, setmsg] = useState('')
                 body:JSON.stringify(values)
               }) 
               const data=await response.json()
+              console.log(data);
+              
              if(data.status==true){
-    setmsg('Your account has been created successfully and your referral code has been sent to your inbox or spam folder')
+    setmsg("Your account has been created successfully and your referral code has been sent to your inbox or spam folder. you'll be redirected shortly")
+    setTimeout(() => {
+    
+        route.push('/student_login')
+    }, 6000);  
+
 } 
-setTimeout(() => {
-    setmsg('')
-}, 4000);  
+else{
+    alert('Email exists')
+}
              }
                   
                
@@ -92,6 +103,9 @@ validationSchema:Yup.object({
             <small className='text-red-400'>{formik.errors.phonenumber}</small>
             <input type="password" name='password' placeholder='Password' className='text-red-200 border border-amber-200' onChange={formik.handleChange}/>
             <small className='text-red-400'>{formik.errors.password}</small>
+            <label htmlFor="">Enter Referral Code</label>
+            <input type="text" placeholder='Enter referral code' name='invitercode' onChange={formik.handleChange} />
+
             <button type='submit' className='border border-amber-950'>Sign up</button>
         </form>
         <div>{msg}</div>
