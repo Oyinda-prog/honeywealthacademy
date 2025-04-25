@@ -30,7 +30,7 @@ const Page = () => {
           }
         );
         const data = await response.json();
-        console.log(data);
+        console.log(data.status);
 
         if (data.status) {
           const studentid = data.user.student_id;

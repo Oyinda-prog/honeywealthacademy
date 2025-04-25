@@ -45,7 +45,7 @@ const Page = () => {
               // console.log(localStorage['instructorid']);
               
               if (data.user.adminteststatus== 1 && data.user.onboarding==1) {
-                route.push(`/${instructorid}/app_center`);
+                route.push(`/app_center`);
               }
               else if(data.user.onboarding==1){
                 route.push(`/instructor_onboarding/onboardingtrue=${instructorid}/testcourse`);

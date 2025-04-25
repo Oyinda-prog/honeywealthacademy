@@ -46,6 +46,9 @@ const Page = () => {
 
    <Link href='app_center/upload_courses'>Upload Course</Link>
    <Link href='app_center/viewcourses'>View Course</Link>
+   
+   <Link href='app_center/test'>Test</Link>
+   {/* <Link href='app_center/viewcourses'>View Course</Link> */}
     </div>
     </>
   )

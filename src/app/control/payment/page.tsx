@@ -17,6 +17,22 @@ import React, { useEffect, useState } from 'react'
 const Page = () => {
     const [msg, setmsg] = useState('')
     const [allpayments, setallpayments] = useState<payment[]>([])
+      const alphabet=['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+      const number=[1,3,4,5,6,7,8,9,0,2]
+        
+        const first=alphabet[Math.floor(Math.random()*alphabet.length)]
+        const second=alphabet[Math.floor(Math.random()*alphabet.length)]
+        const third=alphabet[Math.floor(Math.random()*alphabet.length)]
+        const fourth=Math.floor(Math.random()*10)
+        const fifth=alphabet[Math.floor(Math.random()*alphabet.length)]
+        const a=Math.round(Math.random()*number.length)
+        const sixth=alphabet[Math.floor(Math.random()*alphabet.length)]
+        const seventh=alphabet[Math.floor(Math.random()*alphabet.length)]
+      const couponcode=first+second+third+a+fifth+sixth+fourth+a+seventh
+      
+      const trackingid=crypto.randomUUID()
+      const referenceid=crypto.randomUUID()+a+third+sixth+fourth
+    
 
     try {
         useEffect(() => {
@@ -51,7 +67,7 @@ const Page = () => {
     const checkapprove=async(cartid:number,paymentid:number,studentid:number)=>{
         const res=await fetch('http://localhost/nextjsbackendproject/verifypayment.php',{
             method:'POST',
-            body:JSON.stringify({cartid,paymentid,studentid})
+            body:JSON.stringify({cartid,paymentid,studentid,couponcode,referenceid,trackingid})
         })
            const data=await res.json()
            if(data.status){

@@ -71,6 +71,8 @@ else{
     <Link href='/account/settings/'>Settings</Link>
        <p>Balance: {balance}</p>
        <Link href='/account/withdrawal'>Withdraw</Link>
+       <Link href='/account/enrolled_courses'>Enrolled Courses</Link>
+       <Link href='/account/test'>Write Test</Link>
     </div>
 
     <div>
