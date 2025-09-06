@@ -12,9 +12,13 @@
     "cloudinary": "^2.6.0",
     "env": "^0.0.2",
     "formik": "^2.4.6",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
+    "lucide-react": "^0.542.0",
     "next": "15.2.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-signature-canvas": "^1.1.0-alpha.2",
     "tailwindcss.com": "^1.0.0",
     "yup": "^1.6.1"
   },

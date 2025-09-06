@@ -48,6 +48,7 @@ const Page = () => {
    <Link href='app_center/viewcourses'>View Course</Link>
    
    <Link href='app_center/test'>Test</Link>
+   <Link href='app_center/upload_signature'>Create Signature</Link>
    {/* <Link href='app_center/viewcourses'>View Course</Link> */}
     </div>
     </>

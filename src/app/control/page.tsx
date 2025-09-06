@@ -107,6 +107,7 @@ setmsg('No instructors yet')
   return (
     <>
     <div><Link href='/control/courseview'>View Courses</Link></div>
+    <div><Link href='/control/uploadicon'>upload icon</Link></div>
   <div>{msg}</div>
       {
       
