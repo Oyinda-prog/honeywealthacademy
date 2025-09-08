@@ -1,18 +1,21 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import Navbar from "@/components/Navbar";
 
 const Page = () => {
-  const route = useRouter();
-  const [userid, setuserid] = useState("");
-  const [msg, setmsg] = useState("");
+  const router = useRouter();
+  const [userid, setUserid] = useState<string>("");
+  const [msg, setMsg] = useState<string>("");
 
   useEffect(() => {
-    if (localStorage["studentid"]) {
-      setuserid(JSON.parse(localStorage.getItem("studentid")!));
-      console.log(userid);
+    const storedId = localStorage.getItem("studentid");
+    if (storedId) {
+      setUserid(JSON.parse(storedId));
+      // console.log(JSON.parse(storedId));
     }
   }, []);
 
@@ -21,11 +24,16 @@ const Page = () => {
       educationlevel: "",
       gender: "",
     },
+    validationSchema: Yup.object({
+      educationlevel: Yup.string().required("Education level is required"),
+      gender: Yup.string(),
+    }),
     onSubmit: async (values) => {
       const payload = {
         ...values,
         studentid: userid,
       };
+
       try {
         const response = await fetch(
           "http://localhost/nextjsbackendproject/studentonboarding.php",
@@ -37,66 +45,68 @@ const Page = () => {
             body: JSON.stringify(payload),
           }
         );
+
         const data = await response.json();
 
         if (data.status) {
-          route.push(`/onboarding/onboardingtrue=${userid}`);
+          router.push(`/onboarding/onboardingtrue=${userid}`);
         } else {
-          setmsg(data.onboardingstatus);
-          setTimeout(() => {
-            setmsg("");
-          }, 3000);
+          setMsg(data.onboardingstatus);
+          setTimeout(() => setMsg(""), 3000);
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     },
-    validationSchema: Yup.object({
-      educationlevel: Yup.string().required(),
-      gender: Yup.string().required(),
-    }),
   });
 
   return (
     <>
-      <form action="" onSubmit={formik.handleSubmit}>
-        <label htmlFor="">What is your highest level of education</label>
-        <input
-          type="radio"
-          name="educationlevel"
-          value="High School"
+    <Navbar/>
+    <div className="min-h-screen bg-gradient-to-b from-[#0A1F44] to-white text-white flex items-center justify-center p-4">
+      <form onSubmit={formik.handleSubmit} className="bg-[#0A1F44]/90 p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-6">
+        <h1 className="text-2xl font-bold mb-2 text-amber-400">Student Onboarding</h1>
+
+        <label className="font-semibold">What is your highest level of education</label>
+        <div className="flex flex-col gap-2">
+          {["High School", "Undergraduate", "Post Graduate", "Other"].map((level) => (
+            <label key={level} className="flex items-center gap-3">
+              <input
+                type="radio"
+                name="educationlevel"
+                value={level}
+                onChange={formik.handleChange}
+                checked={formik.values.educationlevel === level}
+                className="accent-amber-400"
+              />
+              <span>{level}</span>
+            </label>
+          ))}
+        </div>
+
+        <label className="font-semibold">Gender (Optional)</label>
+        <select
+          name="gender"
           onChange={formik.handleChange}
-        />
-        <span>High School</span>
-        <input
-          type="radio"
-          name="educationlevel"
-          value="Undergraduate"
-          onChange={formik.handleChange}
-        />{" "}
-        <span>Undergraduate</span>
-        <input
-          type="radio"
-          name="educationlevel"
-          value="Post Graduate"
-          onChange={formik.handleChange}
-        />
-        <span>Post Graduate </span>
-        <input type="radio" name="educationlevel" value="Other" />{" "}
-        <span>Other</span>
-        <label htmlFor="">Gender(Optional)</label>
-        <select name="gender" id="" onChange={formik.handleChange}>
-          <option value=""></option>
+          value={formik.values.gender}
+          className="border border-gray-300 text-black p-2 rounded"
+        >
+          <option value="">Select Gender</option>
           <option value="Female">Female</option>
           <option value="Male">Male</option>
         </select>
-        <button type="submit" className="border border-amber-700">
+
+        <button
+          type="submit"
+          className="bg-amber-400 text-[#0A1F44] font-semibold py-2 rounded hover:bg-amber-500 transition"
+        >
           Submit
         </button>
+
+        {msg && <div className="mt-2 text-red-400">{msg}</div>}
       </form>
-      <div>{msg}</div>
-    </>
-  );
+    </div>
+</>  );
 };
 
 export default Page;

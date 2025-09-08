@@ -1,4 +1,5 @@
 'use client'
+import Navbar from '@/components/Navbar'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import React, { useEffect, useState } from 'react'
@@ -63,8 +64,9 @@ const downloadCertificate = async (index: number) => {
   }
   return (
     <>
+    <Navbar/>
     <p>{msg}</p>
-    <p>
+    <p className='mt-5'>
       {
          Array.isArray(allreceipts)!=true && 
           <p>No Receipts Found Yet</p>
@@ -82,7 +84,7 @@ const downloadCertificate = async (index: number) => {
               if(el){
               refs.current[index]=el
               }
-            }} className='p-4 bg-white'>
+            }} className='p-4 bg-white card'>
             <p>Course Code: {receipt.course_code}</p>
             <p>Language: {receipt.language}</p>
             <p>Amount: #{receipt.price}</p>

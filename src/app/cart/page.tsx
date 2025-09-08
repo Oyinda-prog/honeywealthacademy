@@ -34,18 +34,46 @@ const Page = () => {
   const [carts, setcarts] = useState<Course[]>([]);
 
   useEffect(() => {
-    const course = localStorage.getItem("viewedcourse") || undefined;
-    if (course !== undefined) {
-      const viewedcourse = JSON.parse(course);
-      setviewedcourse(viewedcourse);
+    const stdidStr = localStorage.getItem("studentid");
+    console.log(stdidStr);
+    
+      if (!stdidStr) {
+        route.push("/student_login");
+      }
+  }, [])
+  
+  useEffect(() => {
+    const courseStr = localStorage.getItem("viewedcourse");
+    if (courseStr) {
+      try {
+        const parsedCourse = JSON.parse(courseStr) || '';
+        setviewedcourse(parsedCourse);
+      } catch (err) {
+        setmsg("Something went wrong:"+ err);
+        setviewedcourse(undefined);
+      }
     }
   }, []);
 
+ 
   useEffect(() => {
     const getcart = async () => {
-      const stdid = localStorage.getItem("studentid");
-      if (stdid) {
-        const id = JSON.parse(stdid);
+      const stdidStr = localStorage.getItem("studentid");
+      if (!stdidStr) {
+        route.push("/student_login");
+        return;
+      }
+
+      let id: number;
+      try {
+        id = JSON.parse(stdidStr);
+      } catch {
+     
+        route.push("/student_login");
+        return;
+      }
+
+      try {
         const response = await fetch(
           "http://localhost/nextjsbackendproject/cart.php",
           {
@@ -58,73 +86,86 @@ const Page = () => {
         if (data.status) {
           setcarts(data.carts);
 
-          const gettotal = async () => {
-            const response = await fetch(
-              "http://localhost/nextjsbackendproject/sumprice.php",
-              {
-                method: "POST",
-                body: JSON.stringify({ studentid: id }),
-              }
-            );
-            const data = await response.json();
-            if (data.status) {
-              setprice(data.price);
-            }
-          };
-          gettotal();
-        }
-      } else {
-        route.push("/student_login");
-      }
-    };
-    getcart();
-  }, [viewedcourse, route]);
-
-  const deletecart = async (cartid: number) => {
-    const del = confirm("Are you sure you want to remove this item?");
-    if (del) {
-      const response = await fetch(
-        "http://localhost/nextjsbackendproject/deletecart.php",
-        {
-          method: "POST",
-          body: JSON.stringify({ cartid: cartid }),
-        }
-      );
-      const data = await response.json();
-      if (data.status) {
-        const stdid = localStorage.getItem("studentid");
-        if (stdid) {
-          const id = JSON.parse(stdid);
-          const response = await fetch(
-            "http://localhost/nextjsbackendproject/cart.php",
-            {
-              method: "POST",
-              body: JSON.stringify({ studentid: id }),
-            }
-          );
-          const data = await response.json();
-          if (data.status) {
-            setcarts(data.carts);
-          }
-
-          const res = await fetch(
+          const totalRes = await fetch(
             "http://localhost/nextjsbackendproject/sumprice.php",
             {
               method: "POST",
               body: JSON.stringify({ studentid: id }),
             }
           );
-          const dat = await res.json();
-          if (dat.status) {
-            setprice(data.price);
+          const totalData = await totalRes.json();
+          if (totalData.status) {
+            setprice(totalData.price);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    getcart();
+  }, [viewedcourse, route]);
+
+
+  useEffect(() => {
+    localStorage.setItem("carts", JSON.stringify(carts));
+  }, [carts]);
+
+
+  const deletecart = async (cartid: number) => {
+    const del = confirm("Are you sure you want to remove this item?");
+    if (!del) return;
+
+    try {
+      const response = await fetch(
+        "http://localhost/nextjsbackendproject/deletecart.php",
+        {
+          method: "POST",
+          body: JSON.stringify({ cartid }),
+        }
+      );
+      const data = await response.json();
+
+      if (data.status) {
+        const stdidStr = localStorage.getItem("studentid");
+        if (!stdidStr) return;
+
+        let id: number;
+        try {
+          id = JSON.parse(stdidStr);
+        } catch {
+          console.error("Invalid studentid in localStorage");
+          return;
+        }
+
+        const cartRes = await fetch(
+          "http://localhost/nextjsbackendproject/cart.php",
+          {
+            method: "POST",
+            body: JSON.stringify({ studentid: id }),
+          }
+        );
+        const cartData = await cartRes.json();
+        if (cartData.status) {
+          setcarts(cartData.carts);
+
+          const totalRes = await fetch(
+            "http://localhost/nextjsbackendproject/sumprice.php",
+            {
+              method: "POST",
+              body: JSON.stringify({ studentid: id }),
+            }
+          );
+          const totalData = await totalRes.json();
+          if (totalData.status) {
+            setprice(totalData.price);
           }
         }
       } else {
         setmsg(data.msg);
+        setTimeout(() => setmsg(""), 3000);
       }
-      setTimeout(() => {
-        setmsg("");
-      }, 3000);
+    } catch (err) {
+      // console.error(err);
     }
   };
 
@@ -183,17 +224,16 @@ const Page = () => {
       <div className="max-w-4xl mx-auto p-6 mt-10">
         {carts.length < 1 ? (
           <div className="text-center mt-10">
-  <p className="text-gray-600 text-lg font-medium">
-    No courses in your cart yet.
-  </p>
-  <Link
-    href="/"
-    className="inline-block mt-3 px-5 py-2 bg-blue-900 text-white rounded-lg shadow-md hover:bg-blue-800 transition"
-  >
-    Browse Courses
-  </Link>
-</div>
-
+            <p className="text-gray-600 text-lg font-medium">
+              No courses in your cart yet.
+            </p>
+            <Link
+              href="/"
+              className="inline-block mt-3 px-5 py-2 bg-blue-900 text-white rounded-lg shadow-md hover:bg-blue-800 transition"
+            >
+              Browse Courses
+            </Link>
+          </div>
         ) : (
           <div className="bg-gray-100 p-6 rounded-lg shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-lg font-semibold text-gray-800">

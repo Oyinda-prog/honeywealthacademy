@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 
 interface User {
   email: string;
@@ -44,9 +45,10 @@ const Page = () => {
           localStorage.setItem("instructorid", JSON.stringify(instructorid));
           localStorage.setItem("referralcode", JSON.stringify(refcode));
 
-          if (data.user.adminteststatus == 1 && data.user.onboarding == 1) {
+          if (data.user.adminteststatus == 1 && data.user.onboarding == 1 || data.user.course_status==1) {
             route.push(`/app_center`);
-          } else if (data.user.onboarding == 1) {
+          } 
+          else if (data.user.onboarding == 1) {
             route.push(`/instructor_onboarding/onboardingtrue=${instructorid}/testcourse`);
           } else {
             route.push("/instructor_onboarding");
@@ -68,7 +70,9 @@ const Page = () => {
   })
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-900 to-indigo-900 p-6">
+    <>
+    <Navbar/>
+    <div className="flex items-center justify-center min-h-screen ">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
         
          
@@ -116,13 +120,14 @@ const Page = () => {
             </Link>
           </p>
           <p className="mt-2">
-            <Link href="/forgot-password" className="text-blue-700 hover:underline">
+            <Link href="/forgot_password" className="text-blue-700 hover:underline">
               Forgot Password?
             </Link>
           </p>
         </div>
       </div>
     </div>
+    </>
   )
 }
 

@@ -6,6 +6,7 @@ import React, { useEffect,  useState } from "react";
 import jsPDF from 'jspdf'
 import html2canvas from "html2canvas";
 import Image from "next/image";
+import Navbar from "@/components/Navbar";
 // import Image from "next/image";
 interface Certificate {
   certificate_id: string;
@@ -115,16 +116,23 @@ pdf.save(`certificate-${index + 1}.pdf`)
 
 return (
   <>
-    <p>hello</p>
+    <Navbar/>
     <p>
-      {
+      {/* {
        Array.isArray(allcertificates)!=true && 
-          <p>No Certificates Found Yet</p>
+          <p className="text-center mt-30 fs-6">No Certificates Found Yet</p>
         
-      }
+      } */}
+      {!Array.isArray(allcertificates) && (
+  <p className="text-center mt-8 text-lg font-bold text-gray-900">
+    No Certificates Found Yet
+  </p>
+)}
+
     </p>
     <div>
       {check===true && Array.isArray(allcertificates) && (
+          // <p>Certificates</p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           {allcertificates.map((certificate, index) => (
             <div key={index} className="text-center shadow">
@@ -184,7 +192,7 @@ return (
                 </p>
               </div>
               <button
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="mt-2 px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-600"
                 onClick={() => downloadCertificate(index)}
               >
                 Download Certificate

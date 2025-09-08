@@ -34,11 +34,17 @@ interface Course{
 // import React, { useState } from 'react'
 
 const Page = () => {
-    const route=useRouter()
+    
     const [instructorid, setid] = useState('')
     const [allcourses, setallcourses] = useState([])
     const [coursecode, setcoursecode] = useState([])
-
+    const route=useRouter()
+    useEffect(() => {
+      const id = localStorage.getItem("instructorid");
+      if (!id) {
+        route.push('/')
+      }
+    }, []);
     useEffect(() => {
               const id=localStorage.getItem('instructorid')
              try {
@@ -194,7 +200,7 @@ else{
        }
      
       catch (err) {
-        console.log("Error submitting form", err);
+        setmsg("Error submitting form"+ err);
       }
     
   

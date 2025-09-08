@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface FormikValues {
   code: string;
@@ -17,8 +19,14 @@ interface FormikValues {
 
 const Page = () => {
   const [instructorid, setInstructorid] = useState("");
-const [msg, setmsg] = useState("")
-
+  const [msg, setmsg] = useState("");
+const route=useRouter()
+  useEffect(() => {
+    const id = localStorage.getItem("instructorid");
+    if (!id) {
+      route.push('/')
+    }
+  }, []);
   useEffect(() => {
     const id = localStorage.getItem("instructorid");
     if (id) {
@@ -26,6 +34,7 @@ const [msg, setmsg] = useState("")
       setInstructorid(parsedId);
     }
   }, []);
+
 
   const [video, setVideo] = useState<File | null>(null);
   const [material, setMaterial] = useState<File | null>(null);
@@ -62,7 +71,7 @@ const [msg, setmsg] = useState("")
       level: Yup.string().required("This field is required"),
       accesstype: Yup.string().required("This field is required"),
     }),
-    onSubmit: async(values) => {
+    onSubmit: async (values) => {
       if (!video || !material || !imageCover) {
         alert("Please upload all required files.");
         return;
@@ -82,129 +91,199 @@ const [msg, setmsg] = useState("")
       formData.append("accesstype", values.accesstype);
       formData.append("price", String(values.price));
 
-      console.log(formData);
-      
       try {
-        const response =await fetch("http://localhost/nextjsbackendproject/courses.php", {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          "http://localhost/nextjsbackendproject/courses.php",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
-       const data=await response.json()
-       if(data.status==true){
-setmsg(data.msg)
-setTimeout(() => {
-  setmsg('')  
-}, 3000);
-       }
-       else{
-setmsg(data.msg)
-setTimeout(() => {
-    setmsg('')
-}, 3000);
-       }
-     
-      } 
-      catch (err) {
+        const data = await response.json();
+        console.log(data);
+        
+        if (data.status == true) {
+          setmsg(data.msg);
+          setTimeout(() => {
+            setmsg("");
+          }, 3000);
+        } else {
+          setmsg(data.msg);
+          setTimeout(() => {
+            setmsg("");
+          }, 3000);
+        }
+      } catch (err) {
         console.log("Error submitting form", err);
       }
     },
   });
 
   return (
-    <>
-      <form onSubmit={formik.handleSubmit}>
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-semibold text-[#0A1F44]">
+            Upload a New Course
+          </h2>
+          <p className="text-sm text-gray-500">
+            Fill in the details below to create and publish your course.
+          </p>
+        </div>
+
+      
+        <Link
+          href={`/app_center`}
+          className="bg-[#0A1F44] text-white px-4 py-2 rounded-md hover:bg-[#0A1F44] transition"
+        >
+          Dashboard
+        </Link>
+      </div>
+
+   
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
         <input
           type="text"
           name="code"
           placeholder="Course Code"
-          className="text-red-200 border border-amber-200"
+          className="w-full p-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
           onChange={formik.handleChange}
         />
-        <small className="text-red-400">{formik.errors.code}</small>
+        <small className="text-red-500">{formik.errors.code}</small>
 
         <input
           type="text"
           name="title"
           placeholder="Course Title"
-          className="text-red-200 border border-amber-200"
+          className="w-full p-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
           onChange={formik.handleChange}
         />
-        <small className="text-red-400">{formik.errors.title}</small>
+        <small className="text-red-500">{formik.errors.title}</small>
 
         <input
           type="number"
           name="price"
           placeholder="Enter amount"
-          className="text-red-200 border border-amber-200"
+          className="w-full p-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
           onChange={formik.handleChange}
         />
-        <small className="text-red-400">{formik.errors.price}</small>
+        <small className="text-red-500">{formik.errors.price}</small>
 
         <textarea
           name="description"
           placeholder="Course Description"
+          className="w-full p-2 border border-[#0A1F44] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
           onChange={formik.handleChange}
         ></textarea>
-        <small className="text-red-400">{formik.errors.description}</small>
+        <small className="text-red-500">{formik.errors.description}</small>
 
-        <select name="category" onChange={formik.handleChange}>
-  <option value="">Select Category</option>
-  <option value="Technology & Programming">Technology & Programming</option>
-  <option value="Business & Finance">Business & Finance</option>
-  <option value="Health & Wellness">Health & Wellness</option>
-  <option value="Science & Engineering">Science & Engineering</option>
-  <option value="Marketing & Communication">Marketing & Communication</option>
-  <option value="Design & Creativity">Design & Creativity</option>
-  <option value="Personal Development">Personal Development</option>
-  <option value="Music & Arts">Music & Arts</option>
-  <option value="Education & Teaching">Education & Teaching</option>
-  <option value="Language Learning">Language Learning</option>
-  <option value="Legal & Law">Legal & Law</option>
-  <option value="AI & Data Science">AI & Data Science</option>
-  <option value="Cybersecurity">Cybersecurity</option>
-</select>
-<small className="text-red-400">{formik.errors.category}</small>
+        <select
+          name="category"
+          className="w-full p-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
+          onChange={formik.handleChange}
+        >
+          <option value="">Select Category</option>
+          <option value="Technology & Programming">Technology & Programming</option>
+          <option value="Business & Finance">Business & Finance</option>
+          <option value="Health & Wellness">Health & Wellness</option>
+          <option value="Science & Engineering">Science & Engineering</option>
+          <option value="Marketing & Communication">Marketing & Communication</option>
+          <option value="Design & Creativity">Design & Creativity</option>
+          <option value="Personal Development">Personal Development</option>
+          <option value="Music & Arts">Music & Arts</option>
+          <option value="Education & Teaching">Education & Teaching</option>
+          <option value="Language Learning">Language Learning</option>
+          <option value="Legal & Law">Legal & Law</option>
+          <option value="AI & Data Science">AI & Data Science</option>
+          <option value="Cybersecurity">Cybersecurity</option>
+        </select>
+        <small className="text-red-500">{formik.errors.category}</small>
 
-        <small className="text-red-400">{formik.errors.category}</small>
-
-        <select name="language" onChange={formik.handleChange}>
-            <option value="">Choose Language</option>
+        <select
+          name="language"
+          className="w-full p-2 border border-[#0A1F44] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
+          onChange={formik.handleChange}
+        >
+          <option value="">Choose Language</option>
           <option value="English">English</option>
           <option value="Spanish">Spanish</option>
           <option value="French">French</option>
         </select>
-        <small className="text-red-400">{formik.errors.language}</small>
+        <small className="text-red-500">{formik.errors.language}</small>
 
-        <select name="level" onChange={formik.handleChange}>
-            <option value="">Select Level</option>
+        <select
+          name="level"
+          className="w-full p-2 border border-[#0A1F44] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
+          onChange={formik.handleChange}
+        >
+          <option value="">Select Level</option>
           <option value="Beginner">Beginner</option>
           <option value="Intermediate">Intermediate</option>
           <option value="Advanced">Advanced</option>
         </select>
-        <small className="text-red-400">{formik.errors.level}</small>
+        <small className="text-red-500">{formik.errors.level}</small>
 
-        <select name="accesstype" onChange={formik.handleChange}>
-            <option value="">Select Access Type</option>
+        <select
+          name="accesstype"
+          className="w-full p-2 border border-[#0A1F44] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
+          onChange={formik.handleChange}
+        >
+          <option value="">Select Access Type</option>
           <option value="Lifetime">Lifetime</option>
           <option value="Subscription-Based">Subscription-Based</option>
           <option value="Limited-Time Access">Limited-Time Access</option>
         </select>
-        <small className="text-red-400">{formik.errors.accesstype}</small>
+        <small className="text-red-500">{formik.errors.accesstype}</small>
 
-        <label>Video</label>
-        <input type="file" onChange={(e) => handleFileChange(e, setVideo)} />
-        <label>Image Cover</label>
-        <input type="file" onChange={(e) => handleFileChange(e, setImageCover)} />
-        <label>Material</label>
-        <input type="file" onChange={(e) => handleFileChange(e, setMaterial)} />
+        <div>
+          <label className="block text-sm font-medium text-[#0A1F44]">
+            Upload Video
+          </label>
+          <input
+            type="file"
+            onChange={(e) => handleFileChange(e, setVideo)}
+            className="mt-1 block w-full text-sm text-gray-600"
+          />
+        </div>
 
-        <button type="submit" className="border border-amber-950">
+        <div>
+          <label className="block text-sm font-medium text-[#0A1F44]">
+            Upload Image Cover
+          </label>
+          <input
+            type="file"
+            onChange={(e) => handleFileChange(e, setImageCover)}
+            className="mt-1 block w-full text-sm text-gray-600"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-[#0A1F44]">
+            Upload Material
+          </label>
+          <input
+            type="file"
+            onChange={(e) => handleFileChange(e, setMaterial)}
+            className="mt-1 block w-full text-sm text-gray-600"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-[#0A1F44] text-white py-2 px-4 rounded-md hover:bg-[#112B5C] transition"
+        >
           Upload Course
         </button>
       </form>
-      <div>{msg}</div>
-    </>
+
+      {msg && (
+        <div className="mt-4 p-2 text-center text-white bg-amber-500 rounded-md">
+          {msg}
+        </div>
+      )}
+    </div>
   );
 };
 

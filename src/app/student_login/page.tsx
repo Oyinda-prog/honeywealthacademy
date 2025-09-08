@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
+import Navbar from "@/components/Navbar";
 
 interface User {
   email: string;
@@ -41,7 +42,7 @@ const Page = () => {
           localStorage.setItem("currentstudent", JSON.stringify(data.user));
           localStorage.setItem("invitercode", JSON.stringify(invitercode));
           if (data.user.onboarding === 1) {
-            route.push("/");
+            route.push("/account");
           } else {
             route.push("/onboarding");
           }
@@ -62,6 +63,8 @@ const Page = () => {
   });
 
   return (
+    <>
+    <Navbar/>
     <div className="flex items-center justify-center min-h-screen bg-white p-6">
   
 
@@ -116,6 +119,7 @@ const Page = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

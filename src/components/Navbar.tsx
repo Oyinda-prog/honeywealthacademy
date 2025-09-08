@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import Image from 'next/image'
 
 interface Currentstudent {
   lastname: string,
@@ -13,50 +14,77 @@ interface Currentstudent {
 
 const Navbar = () => {
   const route = useRouter()
-  const [id, setid] = useState(undefined)
+  // const [id, setid] = useState<number | undefined>(undefined)
   const [isOpen, setIsOpen] = useState(false)
+  const [cartlength, setcartlength] = useState(0)
   const [currentstudent, setcurrentstudent] = useState<Currentstudent>({
     lastname: '',
     onboarding: 0,
     referralcode: '',
     student_id: 0
   })
+const [id, setid] = useState('')
+const stdidStr = localStorage.getItem("studentid");
+const instructorid=localStorage.getItem("instructorid")
+const currentinstructor=JSON.parse(localStorage.getItem('currentinstructor')!)
+  useEffect(() => {
+    const getcart = async () => {
+        if(stdidStr){
+       setid(stdidStr)
+       try {
+         const response = await fetch(
+           "http://localhost/nextjsbackendproject/cart.php",
+           {
+             method: "POST",
+             body: JSON.stringify({ studentid: stdidStr }),
+           }
+         );
+         const data = await response.json();
+
+ 
+         if (data.status) {
+          console.log(data);
+          
+           setcartlength(data.carts.length);
+         }
+       } catch (err) {
+         console.error(err);
+       }
+        }
+
+    };
+    getcart();
+  }, [route]);
 
   useEffect(() => {
-    const id = localStorage.getItem('studentid')
-    if (id) {
-      const student_id = JSON.parse(id)
-      console.log(student_id)
-      setid(student_id)
-    }
+   
     const currentstudent = localStorage.getItem("currentstudent");
     if (currentstudent) {
       const currentstd = JSON.parse(currentstudent)
       setcurrentstudent(currentstd)
     }
-  }, [])
-
-  useEffect(() => {
-    console.log(currentstudent);
-  }, [id, currentstudent])
-
-  const logoutuser = () => {
-    const id = localStorage.getItem('currentuser')
-    if (id) {
-      localStorage.removeItem('currentuser')
-      route.push('/student_login')
-    }
+  }, [cartlength])
+  const logout=()=>{
+    localStorage.removeItem('instructorid')
+    route.push('/')
   }
 
   return (
     <>
       <nav className="bg-[#0A1F44] text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center px-8 py-4">
+        <div className="max-w-9xl mx-auto flex justify-between items-center px-2 py-2">
+          <Link href="/" className="text-lg font-bold">
           
-          
-          <Link href="/" className="text-lg font-bold">Honeywealth Academy</Link>
+              <Image
+                src="/images/honeywealthcon.png"
+                alt="profilepicture"
+                height={80}
+                width={155}
+                className="rounded-3xl border-4 border-blue-900 object-cover"
+              />
+            
+          </Link>
 
-        
           <div className="hidden md:flex items-center gap-6 text-base font-medium">
             <Link href="/" className="hover:text-gray-200 transition">Home</Link>
             <Link href="instructor_signup" className="hover:text-gray-200 transition">Instructor Sign Up</Link>
@@ -64,27 +92,51 @@ const Navbar = () => {
             <Link href="signup" className="hover:text-gray-200 transition">Student Sign Up</Link>
             <Link href="student_login" className="hover:text-gray-200 transition">Student Login</Link>
 
-            {currentstudent.lastname !== '' ? (
+            {id ? (
               <span className="italic font-semibold">{currentstudent.lastname}</span>
             ) : (
-              <Link href="" className="hover:text-gray-200 transition">Other Info</Link>
+              <p></p>
+              // <Link href="" className="hover:text-gray-200 transition">Other Info</Link>
             )}
 
-            {currentstudent.lastname !== '' && (
+            
+{instructorid ? (
+              <span className="italic font-semibold">{currentinstructor.lastname}</span>
+            ) : (
+              <p></p>
+              
+            )}
+                      
+{instructorid ? (
+              <Link href="/app_center" className="hover:text-gray-200 transition">Account</Link>
+            ) : (
+              <p></p>
+          
+            )}
+            {instructorid ? (
+              <button  className="hover:text-gray-200 transition" onClick={logout}>Logout</button>
+            ) : (
+              <p></p>
+          
+            )}
+
+            {id && (
               <>
-                <button
-                  onClick={logoutuser}
-                  className="bg-white text-blue-900 px-4 py-2 rounded-md hover:bg-gray-100 transition"
-                >
-                  Logout
-                </button>
-                <Link href="/cart" className="hover:text-gray-200 transition">Cart</Link>
+            
+                <Link href="/cart" className="hover:text-gray-200 transition relative flex items-center">
+                  Cart
+                  {id && cartlength > 0 && (
+                    <span className="ml-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartlength}
+                    </span>
+                  )}
+                </Link>
                 <Link href="/account" className="hover:text-gray-200 transition">Account</Link>
               </>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden text-white"
@@ -93,7 +145,7 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Mobile menu */}
+       
         {isOpen && (
           <div className="md:hidden flex flex-col items-start gap-4 px-8 py-4 bg-blue-900 text-base font-medium">
             <Link href="/" className="hover:text-gray-200 transition">Home</Link>
@@ -110,13 +162,15 @@ const Navbar = () => {
 
             {currentstudent.lastname !== '' && (
               <>
-                <button
-                  onClick={logoutuser}
-                  className="bg-white text-blue-900 px-4 py-2 rounded-md hover:bg-gray-100 transition w-full text-left"
-                >
-                  Logout
-                </button>
-                <Link href="/cart" className="hover:text-gray-200 transition">Cart</Link>
+               
+                <Link href="/cart" className="hover:text-gray-200 transition relative flex items-center">
+                  Cart
+                  {cartlength > 0 && currentstudent && (
+                    <span className="ml-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartlength}
+                    </span>
+                  )}
+                </Link>
                 <Link href="/account" className="hover:text-gray-200 transition">Account</Link>
               </>
             )}

@@ -100,8 +100,7 @@ const Page = () => {
     Learn and Earn Anytime, Anywhere
   </h1>
   <p className="text-base sm:text-lg md:text-xl text-gray-200 max-w-2xl mx-auto">
-    Explore world-class courses taught by top instructors. Upgrade your
-    skills today!
+  Advance your career with courses taught by top professionals. Invite friends to learn with you and earn when they enroll.
   </p>
   <Link
     href="/"

@@ -1,10 +1,19 @@
 'use client'
 
+import { useRouter } from 'next/navigation';
 // import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import SignaturePad from 'react-signature-canvas';
 const Page = () => {
+
   const [instructorid, setinstructorid] = useState('')
+  const route=useRouter()
+  useEffect(() => {
+    const id = localStorage.getItem("instructorid");
+    if (!id) {
+      route.push('/')
+    }
+  }, []);
   useEffect(() => {
     const id=localStorage.getItem('instructorid')
          

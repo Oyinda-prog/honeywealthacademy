@@ -52,8 +52,10 @@ const Page = () => {
   const [carts, setcarts] = useState<number>(0)
   const [msg, setmsg] = useState('')
 
-  useEffect(() => {
-    const getcourses = async () => {
+   useEffect(() => {
+      const stdid = localStorage.getItem("studentid");
+      if(stdid){
+       const getcourses = async () => {
       const response = await fetch("http://localhost/nextjsbackendproject/displaycourses.php", {
         method: 'GET'
       })
@@ -62,24 +64,23 @@ const Page = () => {
       console.log(data)
     }
     getcourses()
-  }, [])
+      } 
+      else {
+        route.push('/student_login');
+      }
+    }, []);
+
 
   useEffect(() => {
-    console.log(id)
-    console.log(allcourses)
+   
     const course = allcourses.find((course) => String(course.course_id) === id)
-    console.log(course)
+   
 
     if (course) {
       setsinglecourse(course)
-      console.log(course)
+      // console.log(course)
     }
-    else {
-      console.log('undefind ooo')
-      setInterval(() => {
-        // route.push('/')
-      }, 5000);
-    }
+    
   }, [allcourses, id])
 
   useEffect(() => {
@@ -176,8 +177,8 @@ const Page = () => {
   return (
     <>
     <Navbar/>
-      <div className="min-h-screen bg-gradient-to-b from-[#0A1F44] to-white text-white">
-        <div className="container mx-auto px-4 py-6">
+      <div className="min-h-screen  bg-gradient-to-b from-[#0A1F44] to-white text-white">
+        <div className="container mx-auto px-4 py-6 ">
         
           <div className="flex justify-end mb-4">
             <Link href="/cart" className="bg-white text-[#0A1F44] font-semibold px-4 py-2 rounded-lg shadow hover:bg-gray-100">
